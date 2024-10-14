@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Bar 2.0</title>
+    <style>
+        :root {
+            --primarycolor: lawngreen;
+            --secondarycolor: lightgrey;
+            --ternarycolor: grey;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-size: 1.2rem;
+        }
+        body {
+            background-color: azure;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .wrapper {
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 20px;
+            max-width: 100%;
+            width: 420px;
+        }
+        .circle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            color: var(--ternarycolor);
+            border: thick solid var(--secondarycolor);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            transition: 1s;
+        }
+        .circle.active {
+            border-color: var(--primarycolor);
+        }
+        
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0;
+            height: 5px;
+            background-color: var(--secondarycolor);
+            width: 100%;
+            z-index: -1;
+            transition: 0.8s ease;
+        }
+
+/* top 50% centers the progressbar top in the middle and 
+    translateY centers it's middle in it's parent's middle */
+        .progress {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0;
+            height: 5px;
+            background-color: var(--primarycolor);
+            width: 0%;
+            z-index: -1;
+            transition: 0.8s ease;
+        }
+
+        button {
+            padding: 5px 20px;
+            border-radius: 5px;
+            border: none;
+            margin: 0 15px;
+            color: white;
+            background-color: var(--primarycolor);
+            cursor: pointer;
+            transition: 0.8s ease;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            background-color: var(--secondarycolor);
+            cursor: not-allowed;
+        }
+
+        p {
+            color: var(--ternarycolor);
+            font-weight: bold;
+            margin-bottom: 30px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <p>✔ September 27</p>
+
+    <p>consoleLog = <span class="livecounter">1</span></p>
+
+    <section class="wrapper">
+        <div class="container">
+            <div class="progress"></div>
+            <div class="circle  active">1</div>
+            <div class="circle">2</div>
+            <div class="circle">3</div>
+            <div class="circle">4</div>
+        </div>
+
+        <button class="prevbtn" disabled >Prev</button>
+        <button class="nextbtn active">Next</button>
+    </section>
+
+    <script>
+        const progressline = document.querySelector ('.progress')
+        const next = document.querySelector ('.nextbtn')
+        const prev = document.querySelector ('.prevbtn')
+        const circles = document.querySelectorAll ('.circle')
+        const screencounter = document.querySelector ('.livecounter')
+
+        let currentlyActive = 1
+
+
+        next.addEventListener ('click', () => {
+            currentlyActive++
+
+        // This condition is barrier to prevent counter from exceeding 4
+            if (currentlyActive > circles.length)
+                currentlyActive = circles.length
+
+            update ()
+
+        })
+
+        prev.addEventListener ('click', () => {
+            currentlyActive--
+
+            // This condition is to prevent counter from below 1
+            if (currentlyActive < 1)
+                currentlyActive = 1
+
+            update ()
+        })
+
+        function update () {
+
+            screencounter.textContent = currentlyActive
+
+            // Adds .active class for circle elements with index
+            // below the currentlyActive index number
+            circles.forEach ((circle, index) => {
+                if (index < currentlyActive)
+                    circle.classList.add ('active')
+                else
+                    circle.classList.remove ('active')
+            })
+
+            // first the currently active classes are counted
+            // subtracted 1 from activecircles because there is still 1 active class (1)
+            // then also from circles because the progressline has 3 parts instead of 4
+            const activeCircles= document.querySelectorAll ('.circle.active')
+
+            progressline.style.width = (activeCircles.length - 1) / (circles.length - 1) * 100 + '%';
+ 
+
+            // work because the statements either return true or false
+            prev.disabled = currentlyActive === 1;
+            next.disabled = currentlyActive === circles.length;
+        }
+
+    </script>
+</body>
+</html>
